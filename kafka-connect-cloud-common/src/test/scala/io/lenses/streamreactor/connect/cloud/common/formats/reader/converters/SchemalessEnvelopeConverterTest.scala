@@ -73,6 +73,26 @@ class SchemalessEnvelopeConverterTest extends AnyFunSuite with Matchers {
     assertHeaders(actual)
   }
 
+  test("envelope with key, null-value, headers and metadata is mapped to a SourceRecord") {
+    val json = Json.obj(
+      "key" -> Json.fromString("key"),
+      "value" -> Json.Null,
+      "headers"  -> createHeaders(),
+      "metadata" -> createMetadata(),
+    )
+
+    val actual = createConverter().convert(json.noSpaces, 0)
+    assertOffsets(actual)
+    actual.topic() shouldBe TargetTopic
+    actual.kafkaPartition() shouldBe Partition
+    actual.timestamp() shouldBe Timestamp
+    actual.keySchema().`type`() shouldBe Schema.OPTIONAL_STRING_SCHEMA.`type`()
+    actual.key() shouldBe "key"
+    actual.valueSchema().`type`() shouldBe Schema.OPTIONAL_BYTES_SCHEMA.`type`()
+    actual.value() shouldBe null
+    assertHeaders(actual)
+  }
+
   test("envelope with key, value and metadata is mapped to a SourceRecord") {
     val json = Json.obj(
       "key" -> Json.fromString("key"),

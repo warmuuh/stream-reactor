@@ -94,8 +94,9 @@ class SchemalessEnvelopeConverter(
             else Schema.OPTIONAL_BYTES_SCHEMA
           }.orNull,
           key.orNull,
-          value.map { _ =>
-            if (!valueIsArray) Schema.OPTIONAL_STRING_SCHEMA
+          value.map { v =>
+            //handle null values as byte-arrays
+            if (v != null && !valueIsArray) Schema.OPTIONAL_STRING_SCHEMA
             else
               Schema.OPTIONAL_BYTES_SCHEMA
           }.orNull,
